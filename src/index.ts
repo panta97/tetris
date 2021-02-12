@@ -110,8 +110,6 @@ class Shape {
 
   // rotate clockwise or counterclockwise
   rotate(clockwise: boolean) {
-    // step angle 45 degress
-    const sAgl = Math.PI / 4;
     // rotation angle 90 degress
     const rAgl = Math.PI / 2;
 
@@ -122,15 +120,21 @@ class Shape {
       const pxl = this.pixels[i];
       const [px, py] = [pxl.posX, pxl.posY];
 
+      // get center distance
+      const cd = Math.max(Math.abs(cpx - px), Math.abs(cpy - py));
+      // step angle
+      // example for cd=1 will be 45 degress
+      const sAgl = Math.PI / (4 * cd);
+
       // circle
-      for (let c = 0; c < 8; c++) {
-        const startX = Math.round(Math.cos(sAgl * c));
+      for (let c = 0; c < 8 * cd; c++) {
+        const startX = Math.round(Math.cos(sAgl * c) * cd);
         const endX = Math.round(
-          Math.cos(sAgl * c + (clockwise ? rAgl : -rAgl))
+          Math.cos(sAgl * c + (clockwise ? rAgl : -rAgl)) * cd
         );
-        const startY = Math.round(Math.sin(sAgl * c));
+        const startY = Math.round(Math.sin(sAgl * c) * cd);
         const endY = Math.round(
-          Math.sin(sAgl * c + (clockwise ? rAgl : -rAgl))
+          Math.sin(sAgl * c + (clockwise ? rAgl : -rAgl)) * cd
         );
 
         if (cpx - px === 0 - startX && cpy - py === 0 - startY) {
