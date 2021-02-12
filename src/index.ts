@@ -6,7 +6,12 @@ enum Group {
 }
 
 class Pixel {
-  constructor(public posX: number, public posY: number, public group: Group) {}
+  constructor(
+    public posX: number,
+    public posY: number,
+    public group: Group,
+    public isCenter?: boolean
+  ) {}
 
   updateCoords(posX: number, posY: number) {
     this.posX += posX;
@@ -23,38 +28,22 @@ enum Direction {
 
 class ShapeBluePrint {
   private bluePrints: string[] = [
-    `##
-     #_
-     #_
+    `__#
+     #@#`,
+    `_##
+      #@_
      `,
-    `_#
-     ##
-     #_`,
-    `##
-     _#
-     _#
+    `#__
+      #@#
      `,
-    `#_
-     ##
-     _#
-     `,
-    `####`,
-    `##
-      ##`,
+    `#@##`,
     `_#_
-       ###`,
+      #@#`,
+    `##_
+       _@#`,
+    `##
+       @#`,
   ];
-  // private bluePrints: string[] = [
-  //   `#
-  //   #
-  //   #
-  //   #`,
-  //   `
-  //   ##
-  //   ##
-  //   `,
-  // ];
-
   constructor() {}
 
   private getRandomBluePrint(): String[] {
@@ -83,7 +72,11 @@ class ShapeBluePrint {
     for (let y = 0; y < bluePrint.length; y++) {
       for (let x = 0; x < bluePrint[y].length; x++) {
         if (bluePrint[y][x] === "#") {
-          const newPixel = new Pixel(x, y, randGroup as Group);
+          const newPixel = new Pixel(x, y, randGroup as Group, false);
+          pixels.push(newPixel);
+        }
+        if (bluePrint[y][x] === "@") {
+          const newPixel = new Pixel(x, y, randGroup as Group, true);
           pixels.push(newPixel);
         }
       }
@@ -115,6 +108,40 @@ class Shape {
     this.pixels.forEach((p: Pixel) => p.updateCoords(moveX, moveY));
   }
 
+  // rotate clockwise or counterclockwise
+  rotate(clockwise: boolean) {
+    // step angle 45 degress
+    const sAgl = Math.PI / 4;
+    // rotation angle 90 degress
+    const rAgl = Math.PI / 2;
+
+    const { posX: cpx, posY: cpy } = this.pixels.filter((p) => p.isCenter)[0];
+    for (let i = 0; i < this.pixels.length; i++) {
+      if (this.pixels[i].isCenter) continue;
+
+      const pxl = this.pixels[i];
+      const [px, py] = [pxl.posX, pxl.posY];
+
+      // circle
+      for (let c = 0; c < 8; c++) {
+        const startX = Math.round(Math.cos(sAgl * c));
+        const endX = Math.round(
+          Math.cos(sAgl * c + (clockwise ? rAgl : -rAgl))
+        );
+        const startY = Math.round(Math.sin(sAgl * c));
+        const endY = Math.round(
+          Math.sin(sAgl * c + (clockwise ? rAgl : -rAgl))
+        );
+
+        if (cpx - px === 0 - startX && cpy - py === 0 - startY) {
+          pxl.posX += endX - startX;
+          pxl.posY += endY - startY;
+          break;
+        }
+      }
+    }
+  }
+
   getClone(): Shape {
     const clonedPixels: Pixel[] = [];
     for (let i = 0; i < this.pixels.length; i++) {
@@ -122,7 +149,8 @@ class Shape {
       const clondePixel: Pixel = new Pixel(
         currShp.posX,
         currShp.posY,
-        currShp.group
+        currShp.group,
+        currShp.isCenter
       );
       clonedPixels.push(clondePixel);
     }
@@ -282,11 +310,14 @@ interface GameOptions {
 class Game {
   private board: Board;
   private SHAPE_BP: ShapeBluePrint;
+  private width: number;
+  private height: number;
   private currentShape: Shape;
 
   constructor(gameops: GameOptions) {
-    const { height, width } = gameops;
-    this.board = new Board(height, width);
+    this.width = gameops.width;
+    this.height = gameops.height;
+    this.board = new Board(this.height, this.width);
     this.SHAPE_BP = new ShapeBluePrint();
     this.currentShape = new Shape(this.SHAPE_BP.createShape());
   }
@@ -304,6 +335,14 @@ class Game {
       this.currentShape.move(dir);
     }
     this.board.deleteFullRows();
+  }
+
+  rotateShapeClockWise() {
+    this.currentShape.rotate(true);
+  }
+
+  rotateShapeCounteClockwise() {
+    this.currentShape.rotate(false);
   }
 
   render(canvas: HTMLCanvasElement) {
@@ -354,6 +393,12 @@ document.addEventListener("keydown", (e: KeyboardEvent) => {
     case "Right":
     case "ArrowRight":
       game.nextMove(Direction.RIGHT);
+      break;
+    case "x":
+      game.rotateShapeClockWise();
+      break;
+    case "z":
+      game.rotateShapeCounteClockwise();
       break;
   }
   game.render(canvas);
