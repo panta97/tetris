@@ -1,3 +1,5 @@
+import { forEachTrailingCommentRange } from "../node_modules/typescript/lib/typescript";
+
 enum Group {
   Empty,
   red,
@@ -223,6 +225,34 @@ class Board {
     }
   }
 
+  // this method should be called after shaped is rotated
+  wallKick(shape: Shape) {
+    // fix position if it's outside board boudaries
+    let minOffsetX = 0,
+      maxOffsetX = 0,
+      minOffsetY = 0,
+      maxOffsetY = 0;
+
+    for (let px = 0; px < shape.pixels.length; px++) {
+      const pixel = shape.pixels[px];
+      if (pixel.posX < 0 || pixel.posX > this.COLS - 1) {
+        minOffsetX = Math.min(pixel.posX, minOffsetX);
+        maxOffsetX = Math.max(pixel.posX, maxOffsetX);
+      }
+      if (pixel.posY < 0 || pixel.posY > this.ROWS - 1) {
+        minOffsetY = Math.min(pixel.posY, minOffsetY);
+        maxOffsetY = Math.max(pixel.posY, maxOffsetY);
+      }
+    }
+
+    if (minOffsetX < 0) shape.move(Direction.RIGHT, Math.abs(minOffsetX));
+    if (maxOffsetX > this.COLS - 1)
+      shape.move(Direction.LEFT, maxOffsetX - (this.COLS - 1));
+    if (minOffsetY < 0) shape.move(Direction.DOWN, Math.abs(minOffsetY));
+    if (maxOffsetY > this.ROWS - 1)
+      shape.move(Direction.UP, maxOffsetY - (this.ROWS - 1));
+  }
+
   shouldMoveShape(shape: Shape, nextMove: Direction) {
     const clonedShape = shape.getClone();
     clonedShape.move(nextMove);
@@ -384,12 +414,9 @@ class Game {
     this.board.deleteFullRows();
   }
 
-  rotateShapeClockWise() {
-    this.currentShape.rotate(true);
-  }
-
-  rotateShapeCounteClockwise() {
-    this.currentShape.rotate(false);
+  rotateShape(clockwise: boolean) {
+    this.currentShape.rotate(clockwise);
+    this.board.wallKick(this.currentShape);
   }
 
   render(canvas: HTMLCanvasElement) {
@@ -442,10 +469,10 @@ document.addEventListener("keydown", (e: KeyboardEvent) => {
       game.nextMove(Direction.RIGHT);
       break;
     case "x":
-      game.rotateShapeClockWise();
+      game.rotateShape(true);
       break;
     case "z":
-      game.rotateShapeCounteClockwise();
+      game.rotateShape(false);
       break;
   }
   game.render(canvas);
