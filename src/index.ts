@@ -86,7 +86,17 @@ class ShapeBluePrint {
 }
 
 class Shape {
-  constructor(public pixels: Pixel[]) {}
+  private offsetStep: { [index: number]: number[] } = {
+    0: [0, 0],
+    1: [0, -1],
+    2: [-1, -1],
+    3: [-1, 0],
+  };
+
+  public rotationStep: number;
+  constructor(public pixels: Pixel[]) {
+    this.rotationStep = 0;
+  }
 
   move(dir: Direction, extend: number = 1) {
     let moveX: number = 0,
@@ -144,6 +154,37 @@ class Shape {
         }
       }
     }
+    this.updateOffset(clockwise);
+  }
+
+  private updateOffset(clockwise: boolean) {
+    // javascript negative modulo bug
+    // correct implementation
+    function mod(n: number, m: number) {
+      return ((n % m) + m) % m;
+    }
+
+    // set offset
+    const nextRotStep: number = clockwise
+      ? this.rotationStep + 1
+      : this.rotationStep - 1;
+
+    const [moveToX, moveToY] = this.offsetStep[mod(nextRotStep, 4)];
+    const [moveFromX, moveFromY] = this.offsetStep[mod(this.rotationStep, 4)];
+    const direct = [moveToX - moveFromX, moveToY - moveFromY];
+
+    if (direct[0] === 0 && direct[1] === 1) {
+      this.move(Direction.DOWN);
+    } else if (direct[0] === 0 && direct[1] === -1) {
+      this.move(Direction.UP);
+    } else if (direct[0] === -1 && direct[1] === 0) {
+      this.move(Direction.RIGHT);
+    } else if (direct[0] === 1 && direct[1] === 0) {
+      this.move(Direction.LEFT);
+    }
+
+    // update rotation step
+    this.rotationStep = nextRotStep;
   }
 
   getClone(): Shape {
@@ -158,7 +199,9 @@ class Shape {
       );
       clonedPixels.push(clondePixel);
     }
-    return new Shape(clonedPixels);
+    const clonedShape = new Shape(clonedPixels);
+    clonedShape.rotationStep = this.rotationStep;
+    return clonedShape;
   }
 }
 
