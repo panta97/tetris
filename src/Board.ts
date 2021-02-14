@@ -250,6 +250,14 @@ class Board {
 
     // add missing rows to the top
     newBoard = [...missingRows, ...newBoard];
+    // reset x and y positions
+    for (let y = 0; y < this.ROWS; y++) {
+      for (let x = 0; x < this.COLS; x++) {
+        newBoard[y][x].posX = x;
+        newBoard[y][x].posY = y;
+      }
+    }
+
     this.board = newBoard;
   }
 }
