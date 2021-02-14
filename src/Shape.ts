@@ -2,6 +2,7 @@ import Direction from "./enums/Direction";
 import Group from "./enums/Group";
 import Pixel from "./Pixel";
 import { bluePrints, ETetromino } from "./enums/Tetromino";
+import mod from "./utils/Mod";
 
 export class ShapeBluePrint {
   constructor() {}
@@ -40,14 +41,6 @@ export class ShapeBluePrint {
 }
 
 export class Shape {
-  private offsetStep: { [index: number]: [number, number] } = {
-    // all ones should be negative
-    0: [0, 0],
-    1: [0, -1],
-    2: [-1, -1],
-    3: [-1, 0],
-  };
-
   public rotationStep: number;
   constructor(public pixels: Pixel[], public type: ETetromino) {
     this.rotationStep = 0;
@@ -76,13 +69,12 @@ export class Shape {
   // same as move but using coordinates
   moveCoords(fromCoord: [number, number], toCoord: [number, number]) {
     // [x, y]
-    let [moveX, moveY] = [toCoord[0] - fromCoord[0], toCoord[1] - fromCoord[1]];
-
-    moveX *= -1; //FIXME: something is wrong with my coords
+    let [moveX, moveY] = [fromCoord[0] - toCoord[0], fromCoord[1] - toCoord[1]];
+    // my Y axis is inverted (offset data)
+    moveY *= -1;
     this.pixels.forEach((p: Pixel) => p.updateCoords(moveX, moveY));
   }
 
-  // rotate clockwise or counterclockwise
   rotate(clockwise: boolean) {
     // rotation angle 90 degress
     const rAgl = Math.PI / 2;
@@ -118,30 +110,14 @@ export class Shape {
         }
       }
     }
-    this.updateOffset(clockwise);
   }
 
-  private updateOffset(clockwise: boolean) {
-    // javascript negative modulo bug
-    // correct implementation
-    function mod(n: number, m: number) {
-      return ((n % m) + m) % m;
-    }
-
+  updateOffsetStep(clockwise: boolean) {
     // set offset
-    const nextRotStep: number = clockwise
+    let nextRotStep: number = clockwise
       ? this.rotationStep + 1
       : this.rotationStep - 1;
-
-    const fromCoord = this.offsetStep[mod(this.rotationStep, 4)];
-    const toCoord = this.offsetStep[mod(nextRotStep, 4)];
-
-    // only apply offset for I and O types (tetrominos)
-    if (this.type === ETetromino.I || this.type === ETetromino.O)
-      this.moveCoords(fromCoord, toCoord);
-
-    // update rotation step
-    this.rotationStep = nextRotStep;
+    this.rotationStep = mod(nextRotStep, 4);
   }
 
   getClone(): Shape {

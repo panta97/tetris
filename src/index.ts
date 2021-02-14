@@ -37,8 +37,7 @@ class Game {
   }
 
   rotateShape(clockwise: boolean) {
-    this.currentShape.rotate(clockwise);
-    this.board.wallKick(this.currentShape);
+    this.board.kick(this.currentShape, clockwise);
   }
 
   render(canvas: HTMLCanvasElement) {

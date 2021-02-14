@@ -2,6 +2,7 @@ import Direction from "./enums/Direction";
 import Group from "./enums/Group";
 import Pixel from "./Pixel";
 import { Shape } from "./Shape";
+import { Coord, OffsetData as OFD } from "./enums/Tetromino";
 
 class Board {
   public board: Pixel[][] = [];
@@ -21,6 +22,7 @@ class Board {
     }
   }
 
+  // DEPRECATED:
   // this method should be called after shaped is rotated
   wallKick(shape: Shape) {
     // fix position if it's outside board boudaries
@@ -47,6 +49,73 @@ class Board {
     if (minOffsetY < 0) shape.move(Direction.DOWN, Math.abs(minOffsetY));
     if (maxOffsetY > this.ROWS - 1)
       shape.move(Direction.UP, maxOffsetY - (this.ROWS - 1));
+  }
+
+  kick(shape: Shape, clockwise: boolean) {
+    let clonedShape = shape.getClone();
+    clonedShape.rotate(clockwise);
+    let moveFrom: Coord, moveTo: Coord;
+    let kickPosible = false;
+    let attempts = 5;
+    for (let atmp = 0; atmp < attempts; atmp++) {
+      [moveFrom, moveTo] = OFD.getData(
+        clonedShape.type,
+        clockwise,
+        clonedShape.rotationStep,
+        atmp
+      );
+      // move to posible kick
+      clonedShape.moveCoords(moveFrom, moveTo);
+      if (
+        !this.shapeOverlapsStack(clonedShape) &&
+        !this.isOutsideBoundaries(clonedShape)
+      ) {
+        kickPosible = true;
+        break;
+      }
+      // reset original position
+      clonedShape.moveCoords(moveTo, moveFrom);
+    }
+
+    if (kickPosible) {
+      shape.rotate(clockwise);
+      shape.updateOffsetStep(clockwise);
+      shape.moveCoords(moveFrom!, moveTo!);
+    }
+  }
+
+  shapeOverlapsStack(shape: Shape) {
+    for (let y = 0; y < this.ROWS; y++) {
+      for (let x = 0; x < this.COLS; x++) {
+        if (this.board[y][x].group === Group.Empty) continue;
+        for (let px = 0; px < shape.pixels.length; px++) {
+          const pixel = shape.pixels[px];
+          if (
+            pixel.posX === this.board[y][x].posX &&
+            pixel.posY === this.board[y][x].posY
+          ) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  isOutsideBoundaries(shape: Shape) {
+    // check if shape is outside the boundaries
+    for (let px = 0; px < shape.pixels.length; px++) {
+      const pixel = shape.pixels[px];
+      //  check for left right and bottom boundary
+      if (
+        pixel.posX < 0 ||
+        pixel.posX > this.COLS - 1 ||
+        pixel.posY > this.ROWS - 1
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 
   shouldMoveShape(shape: Shape, nextMove: Direction) {

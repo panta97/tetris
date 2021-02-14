@@ -1,3 +1,5 @@
+import mod from "../utils/Mod";
+
 export enum ETetromino {
   J = "J",
   L = "L",
@@ -26,8 +28,52 @@ export class Tetromino {
   }
 }
 
-// prettier-ignore
+export type Coord = [number, number];
 
+// prettier-ignore
+export class OffsetData {
+  static letterALL: Coord[][] = [
+    [ [0, 0], [0, 0], [0, 0], [0, 0], [0, 0] ],
+    [ [0, 0], [1, 0], [1, -1], [0, 2], [1, 2] ],
+    [ [0, 0], [0, 0], [0, 0], [0, 0], [0, 0] ],
+    [ [0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2] ],
+  ];
+  static letterI: Coord[][] = [
+    [ [0, 0], [-1, 0], [2, 0], [-1, 0], [2, 0] ],
+    [ [-1, 0], [0, 0], [0, 0], [0, 1], [0, -2] ],
+    [ [-1, 1], [1, 1], [-2, 1], [1, 0], [-2, 0] ],
+    [ [0, 1], [0, 1], [0, 1], [0, -1], [0, 2] ],
+  ];
+  static letterO: Coord[][] = [
+    [ [0, 0]],
+    [ [0, -1]],
+    [ [-1, -1]],
+    [ [-1, 0]],
+  ];
+
+  static getData(type: ETetromino, clockwise: boolean, step: number, attempt: number): [Coord, Coord]  {
+    let moveCoor: [Coord, Coord];
+    const stepTo = mod(step + (clockwise ? 1 : -1), 4)
+    switch (type) {
+      case ETetromino.J:
+      case ETetromino.L:
+      case ETetromino.S:
+      case ETetromino.T:
+      case ETetromino.Z:
+        moveCoor = [this.letterALL[step][attempt], this.letterALL[stepTo][attempt]];
+        break;
+      case ETetromino.I:
+        moveCoor = [this.letterI[step][attempt], this.letterI[stepTo][attempt]];
+        break;
+      case ETetromino.O:
+        moveCoor = [this.letterO[step][attempt], this.letterO[stepTo][attempt]];
+        break;
+    }
+    return moveCoor;
+  }
+}
+
+// prettier-ignore
 export const bluePrints: Tetromino[] = [
   new Tetromino('J', `#__
                       #@#`),
