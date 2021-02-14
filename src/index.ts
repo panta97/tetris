@@ -2,10 +2,13 @@ import Group from "./enums/Group";
 import Direction from "./enums/Direction";
 import { Shape, ShapeBluePrint as SHAPE_BP } from "./Shape";
 import Board from "./Board";
+import CanvasRender from "./Render";
 
 interface GameOptions {
   width: number;
   height: number;
+  pixelSize: number;
+  canvasId: string;
 }
 
 class Game {
@@ -13,12 +16,19 @@ class Game {
   private width: number;
   private height: number;
   private currentShape: Shape;
+  private canvas: CanvasRender;
 
   constructor(gameops: GameOptions) {
     this.width = gameops.width;
     this.height = gameops.height;
     this.board = new Board(this.height, this.width);
     this.currentShape = SHAPE_BP.createShape();
+    this.canvas = new CanvasRender(
+      gameops.canvasId,
+      this.width,
+      this.height,
+      gameops.pixelSize
+    );
   }
 
   nextMove(dir: Direction) {
@@ -40,36 +50,20 @@ class Game {
     this.board.kick(this.currentShape, clockwise);
   }
 
-  render(canvas: HTMLCanvasElement) {
-    const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    const size = 20;
-    // render shape
-    for (let px = 0; px < this.currentShape.pixels.length; px++) {
-      const group = this.currentShape.pixels[px].group;
-      context.fillStyle = Group[group];
-      context.fillRect(
-        this.currentShape.pixels[px].posX * size,
-        this.currentShape.pixels[px].posY * size,
-        size,
-        size
-      );
-    }
-    // render board
-    for (let y = 0; y < this.board.ROWS; y++) {
-      for (let x = 0; x < this.board.COLS; x++) {
-        const group = this.board.board[y][x].group;
-        if (group === Group.Empty) continue;
-        context.fillStyle = Group[group];
-        context.fillRect(x * size, y * size, size, size);
-      }
-    }
+  render() {
+    this.canvas.clear();
+    this.canvas.draw(this.board.board);
+    this.canvas.draw(this.currentShape.pixels);
   }
 }
-const game = new Game({ width: 10, height: 20 });
-let canvas = document.querySelector("#board") as HTMLCanvasElement;
-let context = canvas.getContext("2d") as CanvasRenderingContext2D;
-game.render(canvas);
+const game = new Game({
+  width: 10,
+  height: 20,
+  pixelSize: 20,
+  canvasId: "board",
+});
+
+game.render();
 
 document.addEventListener("keydown", (e: KeyboardEvent) => {
   switch (e.key) {
@@ -96,5 +90,5 @@ document.addEventListener("keydown", (e: KeyboardEvent) => {
       game.rotateShape(false);
       break;
   }
-  game.render(canvas);
+  game.render();
 });
