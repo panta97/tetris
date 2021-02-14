@@ -40,7 +40,8 @@ export class ShapeBluePrint {
 }
 
 export class Shape {
-  private offsetStep: { [index: number]: number[] } = {
+  private offsetStep: { [index: number]: [number, number] } = {
+    // all ones should be negative
     0: [0, 0],
     1: [0, -1],
     2: [-1, -1],
@@ -69,6 +70,15 @@ export class Shape {
         moveX += extend;
         break;
     }
+    this.pixels.forEach((p: Pixel) => p.updateCoords(moveX, moveY));
+  }
+
+  // same as move but using coordinates
+  moveCoords(fromCoord: [number, number], toCoord: [number, number]) {
+    // [x, y]
+    let [moveX, moveY] = [toCoord[0] - fromCoord[0], toCoord[1] - fromCoord[1]];
+
+    moveX *= -1; //FIXME: something is wrong with my coords
     this.pixels.forEach((p: Pixel) => p.updateCoords(moveX, moveY));
   }
 
@@ -123,23 +133,12 @@ export class Shape {
       ? this.rotationStep + 1
       : this.rotationStep - 1;
 
-    const [moveToX, moveToY] = this.offsetStep[mod(nextRotStep, 4)];
-    const [moveFromX, moveFromY] = this.offsetStep[mod(this.rotationStep, 4)];
-    const direct = [moveToX - moveFromX, moveToY - moveFromY];
+    const fromCoord = this.offsetStep[mod(this.rotationStep, 4)];
+    const toCoord = this.offsetStep[mod(nextRotStep, 4)];
 
-    // only apply  offset for I and O types (tetrominos)
-
-    if (this.type === ETetromino.I || this.type === ETetromino.O) {
-      if (direct[0] === 0 && direct[1] === 1) {
-        this.move(Direction.DOWN);
-      } else if (direct[0] === 0 && direct[1] === -1) {
-        this.move(Direction.UP);
-      } else if (direct[0] === -1 && direct[1] === 0) {
-        this.move(Direction.RIGHT);
-      } else if (direct[0] === 1 && direct[1] === 0) {
-        this.move(Direction.LEFT);
-      }
-    }
+    // only apply offset for I and O types (tetrominos)
+    if (this.type === ETetromino.I || this.type === ETetromino.O)
+      this.moveCoords(fromCoord, toCoord);
 
     // update rotation step
     this.rotationStep = nextRotStep;
