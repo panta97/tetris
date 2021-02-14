@@ -84,6 +84,16 @@ class Board {
     }
   }
 
+  hardDrop(shape: Shape) {
+    while (
+      !this.shapeOverlapsStack(shape) &&
+      !this.isOutsideBoundaries(shape)
+    ) {
+      shape.move(Direction.DOWN);
+    }
+    shape.move(Direction.UP);
+  }
+
   shapeOverlapsStack(shape: Shape) {
     for (let y = 0; y < this.ROWS; y++) {
       for (let x = 0; x < this.COLS; x++) {

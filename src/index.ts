@@ -50,6 +50,12 @@ class Game {
     this.board.kick(this.currentShape, clockwise);
   }
 
+  hardDropShape() {
+    this.board.hardDrop(this.currentShape);
+    this.board.addShape(this.currentShape);
+    this.currentShape = SHAPE_BP.createShape();
+  }
+
   render() {
     this.canvas.clear();
     this.canvas.draw(this.board.board);
@@ -88,6 +94,9 @@ document.addEventListener("keydown", (e: KeyboardEvent) => {
       break;
     case "z":
       game.rotateShape(false);
+      break;
+    case " ":
+      game.hardDropShape();
       break;
   }
   game.render();
