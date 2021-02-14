@@ -1,6 +1,6 @@
 import Group from "./enums/Group";
 import Direction from "./enums/Direction";
-import { Shape, ShapeBluePrint } from "./Shape";
+import { Shape, ShapeBluePrint as SHAPE_BP } from "./Shape";
 import Board from "./Board";
 
 interface GameOptions {
@@ -10,7 +10,6 @@ interface GameOptions {
 
 class Game {
   private board: Board;
-  private SHAPE_BP: ShapeBluePrint;
   private width: number;
   private height: number;
   private currentShape: Shape;
@@ -19,8 +18,7 @@ class Game {
     this.width = gameops.width;
     this.height = gameops.height;
     this.board = new Board(this.height, this.width);
-    this.SHAPE_BP = new ShapeBluePrint();
-    this.currentShape = new Shape(this.SHAPE_BP.createShape());
+    this.currentShape = SHAPE_BP.createShape();
   }
 
   nextMove(dir: Direction) {
@@ -30,7 +28,7 @@ class Game {
 
     if (this.board.shouldAddShape(this.currentShape, dir)) {
       this.board.addShape(this.currentShape);
-      this.currentShape = new Shape(this.SHAPE_BP.createShape());
+      this.currentShape = SHAPE_BP.createShape();
       this.currentShape.move(dir);
     } else {
       this.currentShape.move(dir);

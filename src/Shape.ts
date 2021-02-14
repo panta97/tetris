@@ -1,63 +1,41 @@
 import Direction from "./enums/Direction";
 import Group from "./enums/Group";
 import Pixel from "./Pixel";
+import { bluePrints, ETetromino } from "./enums/Tetromino";
 
 export class ShapeBluePrint {
-  private bluePrints: string[] = [
-    `__#
-     #@#`,
-    `_##
-      #@_
-     `,
-    `#__
-      #@#
-     `,
-    `#@##`,
-    `_#_
-      #@#`,
-    `##_
-       _@#`,
-    `##
-       @#`,
-  ];
   constructor() {}
 
-  private getRandomBluePrint(): String[] {
-    const randBP = this.bluePrints[
-      Math.floor(Math.random() * this.bluePrints.length)
-    ];
-
-    if (randBP.indexOf("\n") > -1) {
-      return randBP
-        .split("\n")
-        .map((s) => s.trim())
-        .filter((s) => s !== "");
-    } else {
-      return [randBP];
-    }
+  static getRandomBluePrint() {
+    // const randBP = this.bluePrints[
+    //   Math.floor(Math.random() * this.bluePrints.length)
+    // ];
+    const randBP = bluePrints[Math.floor(Math.random() * bluePrints.length)];
+    return randBP;
   }
 
-  createShape() {
+  static createShape() {
     const bluePrint = this.getRandomBluePrint();
+    const pixelStr = bluePrint.pixelsStr;
     const randGroup = Math.floor(
       Math.random() *
         (Object.keys(Group).filter((e) => isNaN(e as any)).length - 1) +
         1
     );
     const pixels: Pixel[] = [];
-    for (let y = 0; y < bluePrint.length; y++) {
-      for (let x = 0; x < bluePrint[y].length; x++) {
-        if (bluePrint[y][x] === "#") {
+    for (let y = 0; y < pixelStr.length; y++) {
+      for (let x = 0; x < pixelStr[y].length; x++) {
+        if (pixelStr[y][x] === "#") {
           const newPixel = new Pixel(x, y, randGroup as Group, false);
           pixels.push(newPixel);
         }
-        if (bluePrint[y][x] === "@") {
+        if (pixelStr[y][x] === "@") {
           const newPixel = new Pixel(x, y, randGroup as Group, true);
           pixels.push(newPixel);
         }
       }
     }
-    return pixels;
+    return new Shape(pixels, bluePrint.letter as ETetromino);
   }
 }
 
@@ -70,7 +48,7 @@ export class Shape {
   };
 
   public rotationStep: number;
-  constructor(public pixels: Pixel[]) {
+  constructor(public pixels: Pixel[], public type: ETetromino) {
     this.rotationStep = 0;
   }
 
@@ -149,14 +127,18 @@ export class Shape {
     const [moveFromX, moveFromY] = this.offsetStep[mod(this.rotationStep, 4)];
     const direct = [moveToX - moveFromX, moveToY - moveFromY];
 
-    if (direct[0] === 0 && direct[1] === 1) {
-      this.move(Direction.DOWN);
-    } else if (direct[0] === 0 && direct[1] === -1) {
-      this.move(Direction.UP);
-    } else if (direct[0] === -1 && direct[1] === 0) {
-      this.move(Direction.RIGHT);
-    } else if (direct[0] === 1 && direct[1] === 0) {
-      this.move(Direction.LEFT);
+    // only apply  offset for I and O types (tetrominos)
+
+    if (this.type === ETetromino.I || this.type === ETetromino.O) {
+      if (direct[0] === 0 && direct[1] === 1) {
+        this.move(Direction.DOWN);
+      } else if (direct[0] === 0 && direct[1] === -1) {
+        this.move(Direction.UP);
+      } else if (direct[0] === -1 && direct[1] === 0) {
+        this.move(Direction.RIGHT);
+      } else if (direct[0] === 1 && direct[1] === 0) {
+        this.move(Direction.LEFT);
+      }
     }
 
     // update rotation step
@@ -175,7 +157,7 @@ export class Shape {
       );
       clonedPixels.push(clondePixel);
     }
-    const clonedShape = new Shape(clonedPixels);
+    const clonedShape = new Shape(clonedPixels, this.type);
     clonedShape.rotationStep = this.rotationStep;
     return clonedShape;
   }
