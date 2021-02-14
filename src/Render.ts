@@ -14,20 +14,32 @@ class CanvasRender {
   ) {
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     this.context = canvas.getContext("2d")!;
+    canvas.width = width * pixelSize;
+    canvas.height = height * pixelSize;
     this.width = width;
     this.height = height;
+    this.context.translate(0.5, 0.5);
   }
 
   draw(pixels: any[]) {
     const flatPixels = pixels.flatMap((e: any) => e) as Pixel[];
     flatPixels.forEach((p: Pixel) => {
+      this.context.strokeStyle = "black";
       if (p.group === Group.Empty) {
         this.context.fillStyle = "white";
       } else {
         this.context.fillStyle = Group[p.group];
       }
 
+      // pixel color
       this.context.fillRect(
+        p.posX * this.pixelSize,
+        p.posY * this.pixelSize,
+        this.pixelSize,
+        this.pixelSize
+      );
+      // pixel border
+      this.context.strokeRect(
         p.posX * this.pixelSize,
         p.posY * this.pixelSize,
         this.pixelSize,

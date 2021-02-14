@@ -59,7 +59,7 @@ class Game {
 const game = new Game({
   width: 10,
   height: 20,
-  pixelSize: 20,
+  pixelSize: 25,
   canvasId: "board",
 });
 
