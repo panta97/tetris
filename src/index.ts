@@ -3,6 +3,13 @@ import Direction from "./enums/Direction";
 import { Shape, ShapeBluePrint as SHAPE_BP } from "./Shape";
 import Board from "./Board";
 import CanvasRender from "./Render";
+import Animation from "./Animation";
+
+enum UpdateType {
+  nextMove,
+  rotate,
+  hardDrop,
+}
 
 interface GameOptions {
   width: number;
@@ -17,6 +24,7 @@ class Game {
   private height: number;
   private currentShape: Shape;
   private canvas: CanvasRender;
+  private animation: Animation;
 
   constructor(gameops: GameOptions) {
     this.width = gameops.width;
@@ -29,9 +37,10 @@ class Game {
       this.height,
       gameops.pixelSize
     );
+    this.animation = new Animation();
   }
 
-  nextMove(dir: Direction) {
+  private nextMove(dir: Direction) {
     if (!this.board.shouldMoveShape(this.currentShape, dir)) {
       return;
     }
@@ -43,23 +52,41 @@ class Game {
     } else {
       this.currentShape.move(dir);
     }
-    this.board.deleteFullRows();
   }
 
-  rotateShape(clockwise: boolean) {
+  private rotateShape(clockwise: boolean) {
     this.board.kick(this.currentShape, clockwise);
   }
 
-  hardDropShape() {
+  private hardDropShape() {
     this.board.hardDrop(this.currentShape);
     this.board.addShape(this.currentShape);
     this.currentShape = SHAPE_BP.createShape();
+  }
+
+  updateGame(type: UpdateType, param?: Direction | boolean) {
+    switch(type) {
+      case UpdateType.nextMove:
+        this.nextMove(param as Direction);
+      break;
+      case UpdateType.rotate:
+        this.rotateShape(param as boolean);
+        break;
+      case UpdateType.hardDrop:
+        this.hardDropShape();
+        break;
+    }
+
+    const fullRows = this.board.getFullRows();
+    this.board.deleteFullRows(fullRows);
+    this.animation.deleteFullRows(fullRows, this.board);
   }
 
   render() {
     this.canvas.clear();
     this.canvas.draw(this.board.board);
     this.canvas.draw(this.currentShape.pixels);
+    this.canvas.draw(this.animation.getRowsToDelete());
   }
 }
 const game = new Game({
@@ -71,32 +98,44 @@ const game = new Game({
 
 game.render();
 
+let animationId;
+let fps = 2;
+
+function autoMove() {
+  setTimeout(() => {
+    game.updateGame(UpdateType.nextMove, Direction.DOWN);
+    game.render();
+    animationId = requestAnimationFrame(autoMove);
+  }, 1000 / fps);
+}
+// autoMove();
+
 document.addEventListener("keydown", (e: KeyboardEvent) => {
   switch (e.key) {
     case "Down":
     case "ArrowDown":
-      game.nextMove(Direction.DOWN);
+      game.updateGame(UpdateType.nextMove, Direction.DOWN);
       break;
     case "Up":
     case "ArrowUp":
-      game.nextMove(Direction.UP);
+      game.updateGame(UpdateType.nextMove, Direction.UP);
       break;
     case "Left":
     case "ArrowLeft":
-      game.nextMove(Direction.LEFT);
+      game.updateGame(UpdateType.nextMove, Direction.LEFT);
       break;
     case "Right":
     case "ArrowRight":
-      game.nextMove(Direction.RIGHT);
+      game.updateGame(UpdateType.nextMove, Direction.RIGHT);
       break;
     case "x":
-      game.rotateShape(true);
+      game.updateGame(UpdateType.rotate, true);
       break;
     case "z":
-      game.rotateShape(false);
+      game.updateGame(UpdateType.rotate, false);
       break;
     case " ":
-      game.hardDropShape();
+      game.updateGame(UpdateType.hardDrop);
       break;
   }
   game.render();

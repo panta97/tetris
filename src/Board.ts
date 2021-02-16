@@ -218,19 +218,22 @@ class Board {
     }
   }
 
-  // in case there are single group rows
-  // it will delete them
-  deleteFullRows() {
+  getFullRows() {
     let rowsToDelete: number[] = [];
 
     // identify which rows should be deleted
     for (let y = 0; y < this.ROWS; y++) {
       const unique = new Set(this.board[y].map((p: Pixel) => p.group));
-      if (unique.size === 1 && !unique.has(Group.Empty)) {
+      if (!unique.has(Group.Empty)) {
         rowsToDelete.push(y);
       }
     }
 
+    return rowsToDelete;
+  }
+
+  // in case there are full not empty group rows
+  deleteFullRows(rowsToDelete: number[]) {
     let newBoard: Pixel[][] = [];
     for (let y = 0; y < this.ROWS; y++) {
       if (rowsToDelete.some((r) => r === y)) {

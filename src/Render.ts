@@ -21,6 +21,12 @@ class CanvasRender {
     this.context.translate(0.5, 0.5);
   }
 
+  load() {
+    // load all of the arrays of pixels
+    // and draw only once
+    return '';
+  }
+
   draw(pixels: any[]) {
     const flatPixels = pixels.flatMap((e: any) => e) as Pixel[];
     flatPixels.forEach((p: Pixel) => {
