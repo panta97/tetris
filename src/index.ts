@@ -4,6 +4,7 @@ import { Shape, ShapeBluePrint as SHAPE_BP } from "./Shape";
 import Board from "./Board";
 import CanvasRender from "./Render";
 import Animation from "./Animation";
+import { ETetromino } from "./enums/Tetromino";
 
 enum UpdateType {
   nextMove,
@@ -30,7 +31,7 @@ class Game {
     this.width = gameops.width;
     this.height = gameops.height;
     this.board = new Board(this.height, this.width);
-    this.currentShape = SHAPE_BP.createShape();
+    this.currentShape = this.createShape();
     this.canvas = new CanvasRender(
       gameops.canvasId,
       this.width,
@@ -40,6 +41,14 @@ class Game {
     this.animation = new Animation();
   }
 
+  private createShape() {
+    const newShape = SHAPE_BP.createShape();
+    // move shape to the middle of board
+    const fixPos = newShape.type === ETetromino.O ? 1 : 2;
+    newShape.move(Direction.RIGHT, this.width / 2 - fixPos);
+    return newShape;
+  }
+
   private nextMove(dir: Direction) {
     if (!this.board.shouldMoveShape(this.currentShape, dir)) {
       return;
@@ -47,7 +56,7 @@ class Game {
 
     if (this.board.shouldAddShape(this.currentShape, dir)) {
       this.board.addShape(this.currentShape);
-      this.currentShape = SHAPE_BP.createShape();
+      this.currentShape = this.createShape();
       this.currentShape.move(dir);
     } else {
       this.currentShape.move(dir);
@@ -61,14 +70,14 @@ class Game {
   private hardDropShape() {
     this.board.hardDrop(this.currentShape);
     this.board.addShape(this.currentShape);
-    this.currentShape = SHAPE_BP.createShape();
+    this.currentShape = this.createShape();
   }
 
   updateGame(type: UpdateType, param?: Direction | boolean) {
-    switch(type) {
+    switch (type) {
       case UpdateType.nextMove:
         this.nextMove(param as Direction);
-      break;
+        break;
       case UpdateType.rotate:
         this.rotateShape(param as boolean);
         break;
@@ -91,7 +100,7 @@ class Game {
 }
 const game = new Game({
   width: 10,
-  height: 20,
+  height: 24,
   pixelSize: 25,
   canvasId: "board",
 });
@@ -120,14 +129,17 @@ document.addEventListener("keydown", (e: KeyboardEvent) => {
     case "ArrowUp":
       game.updateGame(UpdateType.nextMove, Direction.UP);
       break;
+    case "j":
     case "Left":
     case "ArrowLeft":
       game.updateGame(UpdateType.nextMove, Direction.LEFT);
       break;
+    case "l":
     case "Right":
     case "ArrowRight":
       game.updateGame(UpdateType.nextMove, Direction.RIGHT);
       break;
+    case "k":
     case "x":
       game.updateGame(UpdateType.rotate, true);
       break;

@@ -5,7 +5,6 @@ import { bluePrints, ETetromino } from "./enums/Tetromino";
 import mod from "./utils/Mod";
 
 export class ShapeBluePrint {
-
   static groups = [Group.blue, Group.green, Group.red];
 
   constructor() {}
@@ -21,7 +20,10 @@ export class ShapeBluePrint {
   static createShape() {
     const bluePrint = this.getRandomBluePrint();
     const pixelStr = bluePrint.pixelsStr;
-    const randGroup = ShapeBluePrint.groups[Math.floor(Math.random() * ShapeBluePrint.groups.length)]
+    const randGroup =
+      ShapeBluePrint.groups[
+        Math.floor(Math.random() * ShapeBluePrint.groups.length)
+      ];
 
     const pixels: Pixel[] = [];
     for (let y = 0; y < pixelStr.length; y++) {

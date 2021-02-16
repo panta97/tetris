@@ -24,7 +24,7 @@ class CanvasRender {
   load() {
     // load all of the arrays of pixels
     // and draw only once
-    return '';
+    return "";
   }
 
   draw(pixels: any[]) {

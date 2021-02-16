@@ -3,7 +3,7 @@ enum Group {
   red,
   green,
   blue,
-  yellow,
+  black,
   orange
 }
 
