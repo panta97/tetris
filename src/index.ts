@@ -1,10 +1,9 @@
-import Group from "./enums/Group";
-import Direction from "./enums/Direction";
-import { Shape, ShapeBluePrint as SHAPE_BP } from "./Shape";
-import Board from "./Board";
-import CanvasRender from "./Render";
 import Animation from "./Animation";
+import Board from "./Board";
+import Direction from "./enums/Direction";
 import { ETetromino } from "./enums/Tetromino";
+import CanvasRender from "./Render";
+import { Shape, ShapeBluePrint as SHAPE_BP } from "./Shape";
 
 enum UpdateType {
   nextMove,
@@ -26,6 +25,11 @@ class Game {
   private currentShape: Shape;
   private canvas: CanvasRender;
   private animation: Animation;
+  // update rates
+  private bFps = 2;
+  private scheduleBoard: boolean = false;
+  private aFps = 20;
+  private scheduleAnimation: boolean = false;
 
   constructor(gameops: GameOptions) {
     this.width = gameops.width;
@@ -73,7 +77,8 @@ class Game {
     this.currentShape = this.createShape();
   }
 
-  updateGame(type: UpdateType, param?: Direction | boolean) {
+  // update board state
+  private update(type: UpdateType, param?: Direction | boolean) {
     switch (type) {
       case UpdateType.nextMove:
         this.nextMove(param as Direction);
@@ -85,14 +90,47 @@ class Game {
         this.hardDropShape();
         break;
     }
+  }
 
-    const fullRows = this.board.getFullRows();
-    this.board.deleteFullRows(fullRows);
-    this.animation.deleteFullRows(fullRows, this.board);
+  // update animation state
+  private updateAnimation() {
+    const rowsToDelete = this.board.getFullRows();
+    this.animation.deleteFullRows(rowsToDelete, this.board);
+    const step = this.animation.stateDelete.step;
+    // we update the board after the animation is complete
+    if (step === 0) {
+      this.board.deleteFullRows(rowsToDelete);
+    }
+  }
+
+  // controlled by the machine
+  updateAuto(type: UpdateType, param?: Direction | boolean) {
+    // debouncing board
+    if (!this.scheduleBoard) {
+      setTimeout(() => {
+        this.update(type, param);
+        this.scheduleBoard = false;
+      }, 1000 / this.bFps);
+    }
+    this.scheduleBoard = true;
+
+    // deboucing animation
+    if (!this.scheduleAnimation) {
+      setTimeout(() => {
+        this.updateAnimation();
+        this.scheduleAnimation = false;
+      }, 1000 / this.aFps);
+    }
+    this.scheduleAnimation = true;
+  }
+
+  // controlled by the player
+  updateGame(type: UpdateType, param?: Direction | boolean) {
+    this.update(type, param);
   }
 
   render() {
-    this.canvas.clear();
+    // this.canvas.clear();
     this.canvas.draw(this.board.board);
     this.canvas.draw(this.currentShape.pixels);
     this.canvas.draw(this.animation.getRowsToDelete());
@@ -108,11 +146,11 @@ const game = new Game({
 game.render();
 
 let animationId;
-let fps = 2;
+let fps = 60;
 
 function autoMove() {
   setTimeout(() => {
-    game.updateGame(UpdateType.nextMove, Direction.DOWN);
+    game.updateAuto(UpdateType.nextMove, Direction.DOWN);
     game.render();
     animationId = requestAnimationFrame(autoMove);
   }, 1000 / fps);

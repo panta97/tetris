@@ -3,11 +3,11 @@ import Group from "./enums/Group";
 import Pixel from "./Pixel";
 
 class Animation {
-  private stateDelete = {
+  public stateDelete = {
     blinkingColors: [Group.orange, Group.black],
     pixels: [] as Pixel[][],
     step: 0,
-    untilStep: 2,
+    untilStep: 6,
   };
 
   constructor() {}
