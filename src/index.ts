@@ -29,7 +29,7 @@ class Game {
   private dom: DomRender;
   private animation: Animation;
   // update rates
-  private bFps = 2;
+  private bFps: number;
   private scheduleBoard: boolean = false;
   private aFps = 20;
   private scheduleAnimation: boolean = false;
@@ -39,6 +39,7 @@ class Game {
     this.height = gameops.height;
     this.board = new Board(this.height, this.width);
     this.state = new State(this.width);
+    this.bFps = this.state.getSpeed();
     this.currentShape = this.state.generateShape();
     this.canvas = new CanvasRender(
       gameops.canvasId,
@@ -101,8 +102,10 @@ class Game {
     if (step === 0 && rowsToDelete.length > 0) {
       this.board.deleteFullRows(rowsToDelete);
       this.state.addPoints(rowsToDelete);
-      console.log(this.state.getScore());
       this.dom.updateScore(this.state.getScore());
+      this.dom.updateLevel(this.state.getLevel());
+      this.dom.updateSpeed(this.state.getSpeed());
+      this.bFps = this.state.getSpeed();
     }
   }
 
@@ -159,7 +162,7 @@ function autoMove() {
     animationId = requestAnimationFrame(autoMove);
   }, 1000 / fps);
 }
-// autoMove();
+autoMove();
 
 document.addEventListener("keydown", (e: KeyboardEvent) => {
   switch (e.key) {

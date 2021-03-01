@@ -8,6 +8,8 @@ class State {
   private shapes: Shape[];
   private width: number;
   private score: number = 0;
+  private speed: number = 1;
+  private level: number = 1;
 
   constructor(width: number) {
     this.width = width;
@@ -50,6 +52,21 @@ class State {
         this.score += 1200;
         break;
     }
+
+    this.levelUp(Math.floor(this.score * 0.01) + 1);
+  }
+
+  private levelUp(level: number) {
+    this.level = level;
+    this.speed = level;
+  }
+
+  getLevel() {
+    return this.level;
+  }
+
+  getSpeed() {
+    return this.speed;
   }
 }
 

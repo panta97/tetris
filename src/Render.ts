@@ -72,6 +72,8 @@ class DomRender {
   private nextShapeEl: HTMLDivElement;
   private nextShapeBoard: HTMLDivElement[];
   private scoreEl: HTMLParagraphElement;
+  private speedEl: HTMLParagraphElement;
+  private levelEl: HTMLParagraphElement;
   constructor(elementID: string) {
     this.statsEl = document.getElementById(elementID) as HTMLDivElement;
     this.nextShapeEl = this.statsEl.querySelector(
@@ -81,6 +83,8 @@ class DomRender {
     this.scoreEl = this.statsEl.querySelector(
       ".score-points"
     ) as HTMLParagraphElement;
+    this.speedEl = this.statsEl.querySelector("#speed") as HTMLParagraphElement;
+    this.levelEl = this.statsEl.querySelector("#level") as HTMLParagraphElement;
   }
 
   private positionMiddle(x: number, y: number, type: ETetromino) {
@@ -116,8 +120,16 @@ class DomRender {
     });
   }
 
-  updateScore(newScore: number) {
-    this.scoreEl.textContent = String(newScore).padStart(7, "0");
+  updateScore(score: number) {
+    this.scoreEl.textContent = String(score).padStart(7, "0");
+  }
+
+  updateLevel(level: number) {
+    this.levelEl.textContent = String(level).padStart(2, "0");
+  }
+
+  updateSpeed(speed: number) {
+    this.speedEl.textContent = String(speed).padStart(2, "0");
   }
 }
 

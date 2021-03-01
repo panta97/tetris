@@ -6,6 +6,10 @@ body {
   font-family: "Play", sans-serif;
 }
 
+p {
+  margin: 0;
+}
+
 .container {
   display: flex;
   justify-content: center;
@@ -18,15 +22,11 @@ body {
 #board-stats {
   border: 1px solid magenta;
   width: 120px;
-  padding: 8px 0;
+  padding: 80px 0;
 }
 
 .score {
   margin-bottom: 15px;
-}
-
-.score p {
-  margin: 0;
 }
 
 .score .score-points {
@@ -50,6 +50,7 @@ body {
   margin: 0 auto;
   display: grid;
   grid-template: repeat(4, 1fr) / repeat(4, 1fr);
+  margin-bottom: 15px;
 }
 
 .next-shape div {
@@ -57,4 +58,14 @@ body {
   border-bottom: 1px solid black;
   width: 20px;
   height: 20px;
+}
+
+.speed-level {
+  display: flex;
+  justify-content: space-around;
+}
+
+.speed,
+.level {
+  text-align: center;
 }
