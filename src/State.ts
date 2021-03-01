@@ -3,10 +3,11 @@ import { ETetromino } from "./enums/Tetromino";
 import { Shape, ShapeBluePrint } from "./Shape";
 
 // handle shapes creation
-// handle score
+// handle scoring
 class State {
   private shapes: Shape[];
   private width: number;
+  private score: number = 0;
 
   constructor(width: number) {
     this.width = width;
@@ -27,6 +28,28 @@ class State {
     const newShape = this.shapes.shift()!;
     this.moveMiddle(newShape);
     return newShape;
+  }
+
+  getScore() {
+    return this.score;
+  }
+
+  // add points base on deleted rows
+  addPoints(rowsToDelete: number[]) {
+    switch (rowsToDelete.length) {
+      case 1:
+        this.score += 40;
+        break;
+      case 2:
+        this.score += 100;
+        break;
+      case 3:
+        this.score += 300;
+        break;
+      case 4:
+        this.score += 1200;
+        break;
+    }
   }
 }
 

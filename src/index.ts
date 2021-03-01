@@ -98,8 +98,11 @@ class Game {
     this.animation.deleteFullRows(rowsToDelete, this.board);
     const step = this.animation.stateDelete.step;
     // we update the board after the animation is complete
-    if (step === 0) {
+    if (step === 0 && rowsToDelete.length > 0) {
       this.board.deleteFullRows(rowsToDelete);
+      this.state.addPoints(rowsToDelete);
+      console.log(this.state.getScore());
+      this.dom.updateScore(this.state.getScore());
     }
   }
 
@@ -156,7 +159,7 @@ function autoMove() {
     animationId = requestAnimationFrame(autoMove);
   }, 1000 / fps);
 }
-autoMove();
+// autoMove();
 
 document.addEventListener("keydown", (e: KeyboardEvent) => {
   switch (e.key) {

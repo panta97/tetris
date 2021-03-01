@@ -71,12 +71,16 @@ class DomRender {
   private statsEl: HTMLDivElement;
   private nextShapeEl: HTMLDivElement;
   private nextShapeBoard: HTMLDivElement[];
+  private scoreEl: HTMLParagraphElement;
   constructor(elementID: string) {
     this.statsEl = document.getElementById(elementID) as HTMLDivElement;
     this.nextShapeEl = this.statsEl.querySelector(
       ".next-shape"
     ) as HTMLDivElement;
     this.nextShapeBoard = [...this.nextShapeEl.children] as HTMLDivElement[];
+    this.scoreEl = this.statsEl.querySelector(
+      ".score-points"
+    ) as HTMLParagraphElement;
   }
 
   private positionMiddle(x: number, y: number, type: ETetromino) {
@@ -110,6 +114,10 @@ class DomRender {
       (this.nextShapeBoard[index] as HTMLDivElement).style.backgroundColor =
         Group[p.group];
     });
+  }
+
+  updateScore(newScore: number) {
+    this.scoreEl.textContent = String(newScore).padStart(7, "0");
   }
 }
 
