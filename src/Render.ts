@@ -1,5 +1,7 @@
 import Group from "./enums/Group";
+import { ETetromino } from "./enums/Tetromino";
 import Pixel from "./Pixel";
+import { Shape } from "./Shape";
 
 class CanvasRender {
   private context: CanvasRenderingContext2D;
@@ -64,4 +66,51 @@ class CanvasRender {
   }
 }
 
-export default CanvasRender;
+// responsible of showing game stats
+class DomRender {
+  private statsEl: HTMLDivElement;
+  private nextShapeEl: HTMLDivElement;
+  private nextShapeBoard: HTMLDivElement[];
+  constructor(elementID: string) {
+    this.statsEl = document.getElementById(elementID) as HTMLDivElement;
+    this.nextShapeEl = this.statsEl.querySelector(
+      ".next-shape"
+    ) as HTMLDivElement;
+    this.nextShapeBoard = [...this.nextShapeEl.children] as HTMLDivElement[];
+  }
+
+  private positionMiddle(x: number, y: number, type: ETetromino) {
+    switch (type) {
+      case ETetromino.J:
+      case ETetromino.L:
+      case ETetromino.S:
+      case ETetromino.T:
+      case ETetromino.Z:
+        y += 1;
+        break;
+      case ETetromino.I:
+        y += 2;
+        break;
+      case ETetromino.O:
+        x += 1;
+        y += 1;
+        break;
+    }
+    return y * 4 + x;
+  }
+
+  drawNextShape(shape: Shape) {
+    // clean old next shape
+    this.nextShapeBoard.forEach((ele) => {
+      (ele as HTMLDivElement).style.backgroundColor = "white";
+    });
+
+    shape.pixels.forEach((p) => {
+      let index = this.positionMiddle(p.posX, p.posY, shape.type);
+      (this.nextShapeBoard[index] as HTMLDivElement).style.backgroundColor =
+        Group[p.group];
+    });
+  }
+}
+
+export { CanvasRender, DomRender };

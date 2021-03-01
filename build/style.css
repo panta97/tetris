@@ -1,3 +1,37 @@
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
 #board {
-  border: 2px solid magenta;
+  border: 2px solid black;
+}
+
+#board-stats {
+  border: 1px solid magenta;
+  width: 120px;
+}
+
+.next-shape {
+  /* border: 1px solid magenta; */
+  /* border: 1px solid black; */
+  border-left: 1px solid black;
+  border-top: 1px solid black;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  margin-top: 25px;
+  display: grid;
+  grid-template: repeat(4, 1fr) / repeat(4, 1fr);
+}
+
+.next-shape div {
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  width: 20px;
+  height: 20px;
 }

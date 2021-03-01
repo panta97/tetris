@@ -1,9 +1,9 @@
 import Animation from "./Animation";
 import Board from "./Board";
 import Direction from "./enums/Direction";
-import { ETetromino } from "./enums/Tetromino";
-import CanvasRender from "./Render";
-import { Shape, ShapeBluePrint as SHAPE_BP } from "./Shape";
+import { CanvasRender, DomRender } from "./Render";
+import { Shape } from "./Shape";
+import State from "./State";
 
 enum UpdateType {
   nextMove,
@@ -16,14 +16,17 @@ interface GameOptions {
   height: number;
   pixelSize: number;
   canvasId: string;
+  domId: string;
 }
 
 class Game {
   private board: Board;
+  private state: State;
   private width: number;
   private height: number;
   private currentShape: Shape;
   private canvas: CanvasRender;
+  private dom: DomRender;
   private animation: Animation;
   // update rates
   private bFps = 2;
@@ -35,22 +38,17 @@ class Game {
     this.width = gameops.width;
     this.height = gameops.height;
     this.board = new Board(this.height, this.width);
-    this.currentShape = this.createShape();
+    this.state = new State(this.width);
+    this.currentShape = this.state.generateShape();
     this.canvas = new CanvasRender(
       gameops.canvasId,
       this.width,
       this.height,
       gameops.pixelSize
     );
+    this.dom = new DomRender(gameops.domId);
     this.animation = new Animation();
-  }
-
-  private createShape() {
-    const newShape = SHAPE_BP.createShape();
-    // move shape to the middle of board
-    const fixPos = newShape.type === ETetromino.O ? 1 : 2;
-    newShape.move(Direction.RIGHT, this.width / 2 - fixPos);
-    return newShape;
+    this.dom.drawNextShape(this.state.getNextShape());
   }
 
   private nextMove(dir: Direction) {
@@ -60,7 +58,8 @@ class Game {
 
     if (this.board.shouldAddShape(this.currentShape, dir)) {
       this.board.addShape(this.currentShape);
-      this.currentShape = this.createShape();
+      this.currentShape = this.state.generateShape();
+      this.dom.drawNextShape(this.state.getNextShape());
       this.currentShape.move(dir);
     } else {
       this.currentShape.move(dir);
@@ -74,7 +73,8 @@ class Game {
   private hardDropShape() {
     this.board.hardDrop(this.currentShape);
     this.board.addShape(this.currentShape);
-    this.currentShape = this.createShape();
+    this.currentShape = this.state.generateShape();
+    this.dom.drawNextShape(this.state.getNextShape());
   }
 
   // update board state
@@ -139,8 +139,9 @@ class Game {
 const game = new Game({
   width: 10,
   height: 24,
-  pixelSize: 25,
+  pixelSize: 20,
   canvasId: "board",
+  domId: "board-stats",
 });
 
 game.render();
@@ -155,7 +156,7 @@ function autoMove() {
     animationId = requestAnimationFrame(autoMove);
   }, 1000 / fps);
 }
-// autoMove();
+autoMove();
 
 document.addEventListener("keydown", (e: KeyboardEvent) => {
   switch (e.key) {
