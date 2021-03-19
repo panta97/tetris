@@ -7,6 +7,7 @@ class CanvasRender {
   private context: CanvasRenderingContext2D;
   private width: number;
   private height: number;
+  private pixelRatio = Math.round(window.devicePixelRatio) || 1;
 
   constructor(
     canvasId: string,
@@ -20,7 +21,19 @@ class CanvasRender {
     canvas.height = height * pixelSize;
     this.width = width;
     this.height = height;
+    this.fixBlur();
+  }
+
+  private fixBlur() {
     this.context.translate(0.5, 0.5);
+    const width = this.context.canvas.width * this.pixelRatio;
+    const height = this.context.canvas.height * this.pixelRatio;
+    this.context.canvas.width = width;
+    this.context.canvas.height = height;
+    this.context.canvas.style.width =
+      Math.round(width / this.pixelRatio) + "px";
+    this.context.canvas.style.height =
+      Math.round(height / this.pixelRatio) + "px";
   }
 
   load() {
@@ -41,17 +54,17 @@ class CanvasRender {
 
       // pixel color
       this.context.fillRect(
-        p.posX * this.pixelSize,
-        p.posY * this.pixelSize,
-        this.pixelSize,
-        this.pixelSize
+        p.posX * this.pixelSize * this.pixelRatio,
+        p.posY * this.pixelSize * this.pixelRatio,
+        this.pixelSize * this.pixelRatio,
+        this.pixelSize * this.pixelRatio
       );
       // pixel border
       this.context.strokeRect(
-        p.posX * this.pixelSize,
-        p.posY * this.pixelSize,
-        this.pixelSize,
-        this.pixelSize
+        p.posX * this.pixelSize * this.pixelRatio,
+        p.posY * this.pixelSize * this.pixelRatio,
+        this.pixelSize * this.pixelRatio,
+        this.pixelSize * this.pixelRatio
       );
     });
   }
