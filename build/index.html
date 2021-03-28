@@ -11,38 +11,64 @@
 </head>
 <body>
     <div class="container">
-        <canvas id="board" width="200" height="400"></canvas>
-        <div id="board-stats">
-            <div class="score">
-                <p class="score-points">0000000</p>
-                <p class="title">score</p>
-            </div>
-            <div class="next-shape">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
-            <div class="speed-level">
-                <div class="speed">
-                    <p>speed</p>
-                    <p id="speed">01</p>
+        <div class="console">
+            <div class="display">
+                <canvas id="board" width="200" height="400"></canvas>
+                <div id="board-stats">
+                    <div class="score">
+                        <p class="score-points">0000000</p>
+                        <p class="title">score</p>
+                    </div>
+                    <div class="next-shape">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="speed-level">
+                        <div class="speed">
+                            <p>speed</p>
+                            <p id="speed">01</p>
+                        </div>
+                        <div class="level">
+                            <p>level</p>
+                            <p id="level">01</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="level">
-                    <p>level</p>
-                    <p id="level">01</p>
+            </div>
+            <div class="controls">
+                <div class="arrows">
+                    <div class="arrow-tile"></div>
+                    <div class="arrow-tile arrow-btn arrow-up"></div>
+                    <div class="arrow-tile"></div>
+                    <div class="arrow-tile arrow-btn arrow-left"></div>
+                    <div class="arrow-tile arrow-btn"></div>
+                    <div class="arrow-tile arrow-btn arrow-right"></div>
+                    <div class="arrow-tile"></div>
+                    <div class="arrow-tile arrow-btn arrow-down"></div>
+                    <div class="arrow-tile"></div>
+                </div>
+                <div class="rotate">
+                    <div class="rotate-group">
+                        <div class="rotate-controls">
+                            <div class="clockwise"></div>
+                            <div class="counterclockwise"></div>
+                        </div>
+                        <p class="rotate-title">rotate</p>
+                    </div>
                 </div>
             </div>
         </div>

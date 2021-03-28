@@ -4,6 +4,7 @@
 
 body {
   font-family: "Play", sans-serif;
+  /* background-color: #141440; */
 }
 
 p {
@@ -13,6 +14,20 @@ p {
 .container {
   display: flex;
   justify-content: center;
+}
+
+.console {
+  display: inline-block;
+  padding: 45px;
+  border-radius: 25px;
+  background-color: #f5f3f3;
+}
+
+.display {
+  display: inline-flex;
+  justify-content: center;
+  /* temp */
+  background-color: white;
 }
 
 #board {
@@ -68,4 +83,80 @@ p {
 .speed,
 .level {
   text-align: center;
+}
+
+/* CONTROLS PART */
+
+.controls {
+  margin-top: 20px;
+  padding: 0 10px;
+  color: #848484;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ARROWS */
+.arrows {
+  display: inline-grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+}
+
+.arrow-tile {
+  width: 25px;
+  height: 25px;
+}
+
+.arrow-btn {
+  background-color: #4b4b4b;
+}
+
+.arrow-up,
+.arrow-left,
+.arrow-right,
+.arrow-down {
+  cursor: pointer;
+}
+
+.arrow-up {
+  border-radius: 5px 5px 0 0;
+}
+.arrow-left {
+  border-radius: 5px 0 0 5px;
+}
+.arrow-right {
+  border-radius: 0 5px 5px 0;
+}
+.arrow-down {
+  border-radius: 0 0 5px 5px;
+}
+
+/* ROTATE */
+
+.rotate-group {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  top: 12px;
+  transform: rotate(-35deg);
+}
+.rotate-controls {
+  display: inline-flex;
+  justify-content: space-between;
+  border: 1px solid #848484;
+  width: 96px;
+  padding: 5px;
+  border-radius: 23% / 50%;
+}
+.clockwise,
+.counterclockwise {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #b74645;
+  cursor: pointer;
+}
+
+.rotate-title {
+  font-size: 0.8rem;
 }

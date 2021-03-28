@@ -145,7 +145,7 @@ class Game {
 const game = new Game({
   width: 10,
   height: 24,
-  pixelSize: 20,
+  pixelSize: 16,
   canvasId: "board",
   domId: "board-stats",
 });
